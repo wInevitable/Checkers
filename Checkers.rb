@@ -14,13 +14,15 @@ class Checkers
   end
   
   def play_game
-    
+    until over?
+      #take turns
+    end
   end
   
   private
   
-  def helper_method
-    
+  def over?
+    #check player pieces.nil?
   end
 end
 
