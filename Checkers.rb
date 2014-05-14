@@ -8,9 +8,9 @@ require_relative 'board'
 require_relative 'piece'
 
 class Checkers
-  
+
   attr_reader :board, :current_player, :players
-  
+
   def intialize
     @board = Board.new
     @players = {
@@ -19,7 +19,7 @@ class Checkers
     }
     @current_player = :white
   end
-  
+
   def play
     until over?
       #take turns
@@ -28,24 +28,24 @@ class Checkers
       puts "Recycle your way to Victory!"
     end
   end
-  
+
   private
-  
+
   def over?
     #check player pieces.nil?
   end
 end
 
 class HumanPlayer
-  
+
   attr_reader :color
-  
+
   def initialize(color)
     @color = color
   end
-  
+
   def get_move
-    
+
   end
 end
 

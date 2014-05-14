@@ -1,42 +1,42 @@
 #encoding: utf-8
 
 class Board
-  
+
   attr_reader :board
-  
+
   def initialize(new_game = true)
     build_grid(new_game)
   end
-    
+
   def add_piece(piece, pos)
     raise "this town ain't big enough for the both of us
            - find another position." unless empty?(pos)
     self[pos] = piece
   end
-  
+
   def empty?(pos)
     self[pos].nil?
   end
-  
+
   def [](pos)
     raise 'Pick a spot between 00-77. Row first.' unless valid_pos?(pos)
 
     row, col = pos
     @board[row][col]
   end
-  
+
   def []=(pos, draught)
     raise 'Pick a spot between 00-77. Row first.' unless valid_pos?(pos)
-    
+
     row, col = pos
     @board[row][col] = draught
   end
-  
+
   def valid_pos?(pos)
     pos.all? { |coor| coor.between?(0, 7) }
   end
-  
-  def display
+
+  def display #add r,w,b background!
     puts '   ' + ('A'..'H').to_a.join("  ")
     @board.each_index do |row|
       print (8 - row).to_s + ' '
@@ -48,20 +48,20 @@ class Board
       puts
     end
   end
-  
+
   protected
-  
+
   def build_grid(new_game)
     @board = Array.new(8) { Array.new(8) }
     return unless new_game
-    
+
     [:white, :black].each do |color|
         fill_back_row(color)
         fill_middle_row(color)
         fill_front_row(color)
     end
   end
-  
+
   def fill_back_row(color)
     #black on top, white at the bottom
     #board indices start A,8 in top left corner to H,1
@@ -72,7 +72,7 @@ class Board
       end
     end
   end
-  
+
   def fill_middle_row(color)
     i = (color == :white ? 6 : 1)
     @board[i].each_index do |j|
@@ -81,7 +81,7 @@ class Board
       end
     end
   end
-  
+
   def fill_front_row(color)
     i = (color == :white ? 5 : 2)
     @board[i].each_index do |j|
