@@ -1,5 +1,11 @@
 #encoding: utf-8
 
+require 'pry'
+require 'yaml'
+
+require_relative 'board'
+require_relative 'piece'
+
 class Checkers
   
   attr_reader :board, :current_player, :players
@@ -7,13 +13,13 @@ class Checkers
   def intialize
     @board = Board.new
     @players = {
-      :white = HumanPlayer.new(:white)
-      :black = HumanPlayer.new(:black)
+      :white => HumanPlayer.new(:white),
+      :black => HumanPlayer.new(:black)
     }
     @current_player = :white
   end
   
-  def play_game
+  def play
     until over?
       #take turns
     end
