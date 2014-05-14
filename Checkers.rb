@@ -2,6 +2,7 @@
 
 require 'pry'
 require 'yaml'
+require 'colorize'
 
 require_relative 'board'
 require_relative 'piece'
@@ -46,4 +47,5 @@ class HumanPlayer
 end
 
 g = Checkers.new
+b = Board.new
 pry
