@@ -21,12 +21,18 @@ class Checkers
   end
 
   def play
+    puts "Quick, save the world from the radioactive wastes
+    before they becomes a biohazard disaster and destroy the world!"
+    puts "Recycle your way to Victory!"
+    
     until over?
-      #take turns
-      puts "Quick, save the world from the radioactive wastes
-      before they becomes a biohazard disaster and destroy the world!"
-      puts "Recycle your way to Victory!"
+      @players[@current_player].play_turn(board)
+      @current_player = (@current_player == :white ? :black : :white)
+      #rescue from errors
     end
+    
+    puts 'Game Over Message'
+    #tell who won and lost
   end
 
   private
@@ -44,8 +50,27 @@ class HumanPlayer
     @color = color
   end
 
-  def get_move
+  def play_turn(board)
+    board.display
+    
+    if color == :white 
+      puts "Recycler Message"
+    else
+      puts "Radioactive Message"
+    end
+    from_pos = get_move("Which Piece?")
+    to_pos = get_move("Where to?")
+    
+    board.move(from_pos, to_pos)
 
+    #implement save/load functionality
+  end
+  
+  private
+
+  def get_move(prompt)
+    puts prompt
+    gets.chomp
   end
 end
 

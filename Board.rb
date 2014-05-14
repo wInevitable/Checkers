@@ -48,6 +48,10 @@ class Board
       puts
     end
   end
+  
+  def move(from_pos, to_pos)
+    
+  end
 
   protected
 
@@ -62,6 +66,8 @@ class Board
     end
   end
 
+  private
+  
   def fill_back_row(color)
     #black on top, white at the bottom
     #board indices start A,8 in top left corner to H,1

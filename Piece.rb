@@ -38,6 +38,10 @@ class Piece
     check_promotion unless king
   end
 
+  def forward
+    row + (color == :white ? -1 : 1)
+  end
+
   def perform_jump
 
   end
@@ -50,13 +54,13 @@ class Piece
       color == :white ? self.class::WHITE : self.class::BLACK
     end
   end
-  
+
   def check_promotion #call after move
     king = true if promote?
   end
-  
+
   private
-  
+
   def promote?
     @final_level == pos[0]
   end
