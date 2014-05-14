@@ -7,9 +7,25 @@ class Board
   end
     
   def add_piece(piece, pos)
-    
+    raise "this town ain't big enough for the both of us
+           - find another position."
+    self[pos] = piece
   end
+  
+  def [](pos)
+    raise 'Pick a spot between 00-77.' unless valid_pos?(pos)
+
+    row, col = pos
+    @rows[row][col]
+  end
+  
+  def []=(pos, draught)
+    raise 'Pick a spot between 00-77.' unless valid_pos?(pos)
     
+    row, col = pos
+    @rows[row][col] = draught
+  end
+  
   protected
   
   def build_grid(new_game)
