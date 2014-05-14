@@ -23,6 +23,9 @@ class Checkers
   def play
     until over?
       #take turns
+      puts "Quick, save the world from the radioactive wastes
+      before they becomes a biohazard disaster and destroy the world!"
+      puts "Recycle your way to Victory!"
     end
   end
   

@@ -37,7 +37,7 @@ class Board
   end
   
   def display
-    puts '   ' + ('A'..'H').to_a.join(" ")
+    puts '   ' + ('A'..'H').to_a.join("  ")
     @board.each_index do |row|
       print (8 - row).to_s + ' '
       @board[row].each_with_index do |tile, col|
@@ -48,7 +48,6 @@ class Board
       puts
     end
   end
-  #Fix bugs and Add valid_pos? and display Board methods
   
   protected
   
@@ -65,7 +64,7 @@ class Board
   
   def fill_back_row(color)
     #black on top, white at the bottom
-    #board indices start 0,0 in top left corner to 7,7
+    #board indices start A,8 in top left corner to H,1
     i = (color == :white ? 7 : 0 )
     @board[i].each_index do |j|
       if (i + j).odd?
