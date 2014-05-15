@@ -29,9 +29,14 @@ class Checkers
     puts "Recycle your way to Victory or Doom Us All!"
 
     until over?
-      @players[@current_player].play_turn(board, self)
-      @current_player = (@current_player == :white ? :black : :white)
-      #rescue from errors
+      begin
+        @players[@current_player].play_turn(self)
+      rescue IOError, InvalidMoveError => e
+        puts e.message
+        retry
+      end
+      
+      switch_turns
     end
     
     board.display
@@ -45,8 +50,16 @@ class Checkers
     end
   end
 
+  def switch_turns
+    if @current_player == :white
+      @current_player = :black
+    else
+      @current_player = :white
+    end
+  end
+  
   def save(filename)
-    File.open(filename, "w") do |f|
+    File.open(filename, 'w') do |f|
       f.puts to_yaml
     end
   end
@@ -72,8 +85,8 @@ class HumanPlayer
     @color = color
   end
 
-  def play_turn(board, game)
-    board.display
+  def play_turn(game) #needs to be refactored
+    game.board.display
     
     if color == :white 
       puts "Recycler, you must act fast! Doom is approaching."
@@ -83,21 +96,26 @@ class HumanPlayer
     begin
       from_pos = get_move("Which Piece Would You Like To Move?")
       move_seq = get_move("Please Enter A Move Sequence: B6, A5")
-    
-      if from_pos == "save"
-        game.save(move_seq)
-        return play_turn(board)
+
+      if from_pos[0] == 'save'
+        game.save(move_seq[0])
+        return play_turn(game)
       else
         coords = parse(from_pos, move_seq)
       end
     
-      if board[coords[0]].color == @current_player
-        board[coords.shift].perform_moves(coords)
+      if game.board[coords[0]].nil?
+        raise IOError.new("Please select an actual piece.")
+      end
+
+      if game.board[coords[0]].color == game.current_player
+        game.board[coords.shift].perform_moves(coords)
       else
         raise IOError.new("You can only control your own pieces.")
       end
-    rescue IOError => e
+    rescue IOError, InvalidMoveError => e
       puts e.message
+      game.board.display
       retry
     end
   end
@@ -122,6 +140,4 @@ class HumanPlayer
 end
 
 g = Checkers.new
-b = Board.new
-b.display
 pry
