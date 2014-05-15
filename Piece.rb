@@ -25,14 +25,37 @@ class Piece
     end
   end
   
+  def perform_moves(start, finish)
+    
+  end
+  
   #selects valid moves from all possible moves
   def valid_moves
     moves.select do |end_pos|
       board.valid_pos?(end_pos) && board.empty?(end_pos)
     end
   end
-  
-  def perform_moves!(move_sequence)
+
+  def valid_move_seq?(move_seq)
+    start = board[move_seq[0]]
+    start.perform_move!(move_seq, board.dup)
+  end
+
+  def move(from_pos, to_pos)
+    if self.valid_moves.include?(to_pos)
+      self.pos = to_pos
+      check_promotion
+      board[from_pos] = nil
+      board[to_pos] = self
+    end
+
+    #check for jumping move
+    if (from_pos[0] + to_pos[0]).even?
+      board[mid_pos(from_pos, to_pos)] = nil
+    end
+  end 
+
+  def perform_moves!(move_sequence, dup_board)
     if move_sequence.count == 1
       valid = pos.valid_moves.include?(move_sequence[0])
     else
@@ -51,10 +74,6 @@ class Piece
     #calls perform_moves! on a duped piece/board
     #use begin/rescue/else to return true/false in response to 
     #perform_move! succeeding - no error? true
-  end
-  
-  def check_promotion
-    self.king = true if pos[0] == (color == :white ? 0 : 7)
   end
   
   private
@@ -90,11 +109,27 @@ class Piece
     end
     #check for piece in between
     jumping_moves.select do |jump|
-      board.has_enemy?(self, jump)
+      has_enemy?(jump)
     end
   end
 
   def jumping_row
     pos[0] + (color == :white ? -2 : 2)
   end
+  
+  def check_promotion
+    self.king = true if pos[0] == (color == :white ? 0 : 7)
+  end
+  
+  def has_enemy?(to_pos)
+    pos = mid_pos(to_pos)
+    !board.empty?(pos) && board[pos].color != self.color
+  end
+
+  def mid_pos(to_pos)
+    mid_pos = []
+    mid_pos[0] = (to_pos[0] + pos[0]) / 2
+    mid_pos[1] = (to_pos[1] + pos[1]) / 2
+    mid_pos
+  end 
 end

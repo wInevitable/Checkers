@@ -50,37 +50,6 @@ class Board
       puts
     end
   end
-  
-  def valid_move_seq?(from_pos, to_pos)
-    new_board = board.dup
-  end
-  
-  def move(from_pos, to_pos)
-    draught = self[from_pos]
-    if draught.valid_moves.include?(to_pos)
-      draught.pos = to_pos
-      draught.check_promotion
-      self[from_pos] = nil
-      self[to_pos] = draught
-    end
-    
-    #check for jumping move
-    if (from_pos[0] + to_pos[0]).even?
-      self[mid_pos(from_pos, to_pos)] = nil
-    end
-  end
-  
-  def has_enemy?(piece, to_pos)
-    pos = mid_pos(piece.pos, to_pos)
-    !self.empty?(pos) && self[pos].color != piece.color
-  end
-  
-  def mid_pos(from_pos, to_pos)
-    mid_pos = []
-    mid_pos[0] = (to_pos[0] + from_pos[0]) / 2
-    mid_pos[1] = (to_pos[1] + from_pos[1]) / 2
-    mid_pos
-  end
 
   def dup
     new_board = Board.new(false)

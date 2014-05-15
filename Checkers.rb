@@ -61,7 +61,7 @@ class HumanPlayer
     from_pos = get_move("Which Piece?")
     to_pos = get_move("Where to?")
     
-    board.move(from_pos, to_pos)
+    board[from_pos].perform_moves(from_pos, to_pos)
 
     #implement save/load functionality
   end
@@ -76,8 +76,8 @@ end
 
 g = Checkers.new
 b = Board.new
-b.move([2,3],[3,2])
-b.move([5,4],[4,3])
+b[[2,3]].move([2,3],[3,2])
+b[[5,4]].move([5,4],[4,3])
 b.display
 
 pry
