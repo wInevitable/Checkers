@@ -13,9 +13,8 @@ class Piece
   def initialize(board, pos, color, king = false)
     raise 'invalid color' unless [:white, :black].include?(color)
     raise 'invalid pos' unless board.valid_pos?(pos)
-    @board, @pos, @color = board, pos, color
+    @board, @pos, @color, @king = board, pos, color, king
     board[pos] = self
-    @king = king
   end
 
   def display
@@ -34,8 +33,24 @@ class Piece
   end
   
   def perform_moves!(move_sequence)
-    #takes in either one slide of one or more jumps
-    #so an array of count 1 or greater
+    if move_sequence.count == 1
+      valid = pos.valid_moves.include?(move_sequence[0])
+    else
+      #valid = ?
+    end
+    #multiple jumps...
+    
+    if valid
+      #execute move
+    else
+      #raise an InvalidMoreError if sequence fails
+    end
+  end
+  
+  def valid_move_seq?
+    #calls perform_moves! on a duped piece/board
+    #use begin/rescue/else to return true/false in response to 
+    #perform_move! succeeding - no error? true
   end
   
   def check_promotion

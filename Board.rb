@@ -51,6 +51,10 @@ class Board
     end
   end
   
+  def valid_move_seq?(from_pos, to_pos)
+    new_board = board.dup
+  end
+  
   def move(from_pos, to_pos)
     draught = self[from_pos]
     if draught.valid_moves.include?(to_pos)
@@ -78,6 +82,14 @@ class Board
     mid_pos
   end
 
+  def dup
+    new_board = Board.new(false)
+    pieces.each do |piece|
+      Piece.new(new_board, piece.pos, piece.color, piece.king)
+    end
+    new_board
+  end
+
   protected
 
   def build_grid(new_game)
@@ -90,6 +102,14 @@ class Board
   end
 
   private
+    
+  def pieces(color = nil)
+    pieces = @board.flatten.compact
+    if color
+      pieces.select { |piece| piece.color == color}
+    end
+    pieces
+  end
 
   def fill_board(color)
     row = (color == :white ? [7, 6, 5] : [0, 1, 2])
