@@ -6,12 +6,15 @@ require 'colorize'
 
 require_relative 'board'
 require_relative 'piece'
+require_relative 'invalid_move_error'
 
 class Checkers
 
-  attr_reader :board, :current_player, :players
+  attr_reader :players
+  
+  attr_accessor :current_player, :board
 
-  def intialize
+  def initialize
     @board = Board.new
     @players = {
       :white => HumanPlayer.new(:white),
@@ -24,7 +27,7 @@ class Checkers
     puts "Quick, save the world from the radioactive wastes
     before they becomes a biohazard disaster and destroy the world!"
     puts "Recycle your way to Victory!"
-    
+    p @board
     until over?
       @players[@current_player].play_turn(board)
       @current_player = (@current_player == :white ? :black : :white)
@@ -32,13 +35,15 @@ class Checkers
     end
     
     puts 'Game Over Message'
-    #tell who won and lost
+    puts "#{@players[@current_player]} has lost."
   end
 
   private
 
   def over?
-    #check player pieces.nil?
+    @board.board.flatten.compact.none? do |piece|
+      piece.color == @current_player
+    end
   end
 end
 
@@ -59,9 +64,9 @@ class HumanPlayer
       puts "Radioactive Message"
     end
     from_pos = get_move("Which Piece?")
-    to_pos = get_move("Where to?")
+    move_seq = get_move("Where to?")
     
-    board[from_pos].perform_moves(from_pos, to_pos)
+    board[from_pos].perform_moves(move_seq)
 
     #implement save/load functionality
   end
@@ -76,8 +81,6 @@ end
 
 g = Checkers.new
 b = Board.new
-b[[2,3]].move([2,3],[3,2])
-b[[5,4]].move([5,4],[4,3])
 b.display
-
+#b[[2,1]].perform_moves([[3,0]])
 pry

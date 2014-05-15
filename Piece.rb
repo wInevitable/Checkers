@@ -1,5 +1,6 @@
 #encoding: utf-8
 # unicode: http://unicode-table.com/en/sections/miscellaneous-symbols/
+require_relative 'invalid_move_error'
 
 class Piece
 
@@ -14,7 +15,7 @@ class Piece
     raise 'invalid color' unless [:white, :black].include?(color)
     raise 'invalid pos' unless board.valid_pos?(pos)
     @board, @pos, @color, @king = board, pos, color, king
-    board[pos] = self
+    self.board[pos] = self
   end
 
   def display
@@ -25,62 +26,72 @@ class Piece
     end
   end
   
-  def perform_moves(start, finish)
-    
-  end
-  
-  #selects valid moves from all possible moves
-  def valid_moves
-    moves.select do |end_pos|
-      board.valid_pos?(end_pos) && board.empty?(end_pos)
-    end
-  end
-
-  def valid_move_seq?(move_seq)
-    start = board[move_seq[0]]
-    start.perform_move!(move_seq, board.dup)
-  end
-
-  def move(from_pos, to_pos)
-    if self.valid_moves.include?(to_pos)
-      self.pos = to_pos
+  def perform_moves(seq)
+    if valid_move_seq?(seq)
+      old_pos = self.pos
+      perform_moves!(seq, board)
+      self.board[old_pos] = nil
+      self.board[seq[-1]] = self
       check_promotion
-      board[from_pos] = nil
-      board[to_pos] = self
-    end
-
-    #check for jumping move
-    if (from_pos[0] + to_pos[0]).even?
-      board[mid_pos(from_pos, to_pos)] = nil
-    end
-  end 
-
-  def perform_moves!(move_sequence, dup_board)
-    if move_sequence.count == 1
-      valid = pos.valid_moves.include?(move_sequence[0])
     else
-      #valid = ?
-    end
-    #multiple jumps...
-    
-    if valid
-      #execute move
-    else
-      #raise an InvalidMoreError if sequence fails
+      raise InvalidMoveError.new("Enter a valid sequence.")
     end
   end
-  
-  def valid_move_seq?
+
+  def valid_move_seq?(seq)
     #calls perform_moves! on a duped piece/board
     #use begin/rescue/else to return true/false in response to 
     #perform_move! succeeding - no error? true
+    begin
+      piece_dup = self.dup
+      piece_dup.perform_moves!(seq, board.dup)
+    rescue InvalidMoveError => e
+      false
+    else
+      true
+    end
+  end
+
+  def perform_moves!(move_seq, move_board)
+    #iterate through the array "move_seq"
+    #execute one move at a time...
+    if move_seq.count == 1
+      single_move(self.pos, move_seq[0], move_board)
+      self.pos = move_seq[0]
+    else
+      move_seq.each do |move|
+        multi_move(self.pos, move, move_board)
+        self.pos = move
+      end
+    end
+  end
+
+  def single_move(from_pos, to_pos, move_board)
+    pos_moves = self.valid_moves(move_board) - self.jumping_moves
+    if pos_moves.include?(to_pos)
+      true
+    else
+      raise InvalidMoveError.new("Sequence is not valid.")
+    end
   end
   
-  private
-  
-  #returns all possible moves
-  def moves
-    sliding_moves + jumping_moves
+  def multi_move(from_pos, to_pos, move_board)
+    pos_moves = self.valid_moves(move_board) - self.sliding_moves
+    if pos_moves.include?(to_pos)
+      true
+    else
+      raise InvalidMoveError.new("Sequence is not valid.")
+    end
+
+    #remove opponent
+    move_board[mid_pos(to_pos)] = nil
+  end
+
+  #selects valid moves from all possible moves
+  def valid_moves(temp_board)
+    moves.select do |end_pos|
+      temp_board.valid_pos?(end_pos) && temp_board.empty?(end_pos)
+    end
   end
   
   def sliding_moves
@@ -92,11 +103,6 @@ class Piece
                         [-sliding_row, pos[1] - 1]]
     end
     sliding_moves
-  end
-  
-  def sliding_row
-    #black moves down, white moves up
-    pos[0] + (color == :white ? -1 : 1)
   end
   
   def jumping_moves
@@ -113,6 +119,18 @@ class Piece
     end
   end
 
+  private
+
+  #returns all possible moves
+  def moves
+    sliding_moves + jumping_moves
+  end
+  
+  def sliding_row
+    #black moves down, white moves up
+    pos[0] + (color == :white ? -1 : 1)
+  end
+  
   def jumping_row
     pos[0] + (color == :white ? -2 : 2)
   end
@@ -123,7 +141,9 @@ class Piece
   
   def has_enemy?(to_pos)
     pos = mid_pos(to_pos)
-    !board.empty?(pos) && board[pos].color != self.color
+    if board.valid_pos?(to_pos)
+      !board.empty?(pos) && board[pos].color != self.color
+    end
   end
 
   def mid_pos(to_pos)
