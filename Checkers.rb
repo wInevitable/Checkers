@@ -76,4 +76,8 @@ end
 
 g = Checkers.new
 b = Board.new
+b.move([2,3],[3,2])
+b.move([5,4],[4,3])
+b.display
+
 pry
