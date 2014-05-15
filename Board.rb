@@ -43,7 +43,7 @@ class Board
         if (row + col).odd?
           pos = pos.colorize(:background => :white)
         else
-          pos = pos.colorize(:background => :red)
+          pos = pos.colorize(:background => :green)
         end
         print pos
       end

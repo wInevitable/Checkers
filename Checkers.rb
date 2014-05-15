@@ -24,20 +24,37 @@ class Checkers
   end
 
   def play
-    puts "Quick, save the world from the radioactive wastes
-    before they becomes a biohazard disaster and destroy the world!"
-    puts "Recycle your way to Victory!"
-    p @board
+    puts "Quick! Save the world from the radioactive wastes" +
+    " before they become a biohazard disaster and destroy the world!"
+    puts "Recycle your way to Victory or Doom Us All!"
+
     until over?
-      @players[@current_player].play_turn(board)
+      @players[@current_player].play_turn(board, self)
       @current_player = (@current_player == :white ? :black : :white)
       #rescue from errors
     end
     
-    puts 'Game Over Message'
-    puts "#{@players[@current_player]} has lost."
+    board.display
+    if @current_player == :white
+      puts "Holder of the White Pieces, "
+      puts "You have failed Planet Earth!"
+      puts "We shall all perish at the hands of the Waste."
+    else
+      puts "Victory! Planet Earth shall endure."
+      puts "Let the Biohazards be banished to the darkness!"
+    end
   end
 
+  def save(filename)
+    File.open(filename, "w") do |f|
+      f.puts to_yaml
+    end
+  end
+  
+  def self.load(filename)
+    YAML::load_file(filename)
+  end
+  
   private
 
   def over?
@@ -55,32 +72,56 @@ class HumanPlayer
     @color = color
   end
 
-  def play_turn(board)
+  def play_turn(board, game)
     board.display
     
     if color == :white 
-      puts "Recycler Message"
+      puts "Recycler, you must act fast! Doom is approaching."
     else
-      puts "Radioactive Message"
+      puts "Spread your disease at your own peril, Black Knight."
     end
-    from_pos = get_move("Which Piece?")
-    move_seq = get_move("Where to?")
+    begin
+      from_pos = get_move("Which Piece Would You Like To Move?")
+      move_seq = get_move("Please Enter A Move Sequence: B6, A5")
     
-    board[from_pos].perform_moves(move_seq)
-
-    #implement save/load functionality
+      if from_pos == "save"
+        game.save(move_seq)
+        return play_turn(board)
+      else
+        coords = parse(from_pos, move_seq)
+      end
+    
+      if board[coords[0]].color == @current_player
+        board[coords.shift].perform_moves(coords)
+      else
+        raise IOError.new("You can only control your own pieces.")
+      end
+    rescue IOError => e
+      puts e.message
+      retry
+    end
   end
   
   private
 
   def get_move(prompt)
     puts prompt
-    gets.chomp
+    gets.chomp.split(",")
   end
+  
+  def parse(from, to)
+      coords = [from, to]
+      coords.flatten.map do |cor|
+        unless /[a-h][1-8]/ === cor
+          raise IOError.new("Enter Coordinates between A0-H8 OR
+          save and 'filename'")
+        end
+        [8 - cor[1].to_i, ('a'..'h').to_a.index(cor[0])]
+      end
+   end
 end
 
 g = Checkers.new
 b = Board.new
 b.display
-#b[[2,1]].perform_moves([[3,0]])
 pry

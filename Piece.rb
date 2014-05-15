@@ -136,7 +136,13 @@ class Piece
   end
   
   def check_promotion
-    self.king = true if pos[0] == (color == :white ? 0 : 7)
+    if pos[0] == 0 && color == :white && !self.king
+      self.king = true
+      puts "A Super Recycler has joined the fight!"
+    elsif pos[0] == 7 && !self.king
+      self.king = true
+      puts "Another Biohazard has Emerged to Threaten Earth..."
+    end
   end
   
   def has_enemy?(to_pos)
